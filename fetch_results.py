@@ -69,6 +69,8 @@ def get(item):
             data.get('candidates'), list
         ):
             raise ValueError('Unexpected API response')
+        if data.get('test_data') is not False:
+            raise ValueError('Provider data is simulated or unverified')
 
         # Keep race-level candidates only.
         return name, {
@@ -83,18 +85,6 @@ def get(item):
         }
 
     except Exception as exc:
-        previous = old.get('races', {}).get(name)
-
-        if (
-            previous
-            and previous.get('race_id') == rid
-            and previous.get('data')
-        ):
-            previous['error'] = (
-                'Latest update failed; showing last successful snapshot'
-            )
-            return name, previous
-
         return name, {
             'race_id': rid,
             'error': str(exc)[:180]
